@@ -7,7 +7,8 @@ export default defineNuxtConfig({
   ],
   css: ['~/assets/css/forms.css'],
   runtimeConfig: {
-    jwtSecret: 'your-secret-key-change-in-production',
+    jwtSecret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+    databaseUrl: process.env.DATABASE_URL,
     public: {
       gtmId: '',
       apiBase: '/api'

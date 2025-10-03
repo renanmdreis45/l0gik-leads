@@ -1,81 +1,44 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
-    <header class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center py-6">
-          <div class="flex justify-start">
-            <h1 class="text-2xl font-bold text-gray-900">L0gik Leads</h1>
-          </div>
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div class="max-w-md w-full bg-white rounded-lg shadow p-6">
+      <h1 class="text-2xl font-bold text-center mb-6">Admin Login</h1>
+      
+      <form @submit.prevent="handleLogin" class="space-y-4">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Usuário</label>
+          <input 
+            id="username"
+            v-model="form.username" 
+            type="text" 
+            required
+            class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
-      </div>
-    </header>
 
-    <main class="max-w-2xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <div class="text-center mb-12">
-        <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-          Área Administrativa
-        </h2>
-        <p class="mt-4 text-xl text-gray-600">
-          Faça login para acessar o painel de gestão de leads
-        </p>
-      </div>
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+          <input 
+            id="password"
+            v-model="form.password" 
+            type="password" 
+            required
+            class="w-full border border-gray-300 rounded-md px-3 py-2 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>        <div v-if="error" class="text-red-600 text-sm">{{ error }}</div>
 
-      <div class="form-container">
-        <form @submit.prevent="handleLogin" class="space-y-6">
-          <div class="form-field">
-            <label for="username" class="form-label">Usuário</label>
-            <input
-              id="username"
-              v-model="form.username"
-              type="text"
-              required
-              class="form-input"
-              placeholder="Digite seu usuário"
-            />
-          </div>
-
-          <div class="form-field">
-            <label for="password" class="form-label">Senha</label>
-            <input
-              id="password"
-              v-model="form.password"
-              type="password"
-              required
-              class="form-input"
-              placeholder="Digite sua senha"
-            />
-          </div>
-
-          <div v-if="error" class="bg-red-50 border border-red-200 rounded-md p-4">
-            <p class="text-red-800">{{ error }}</p>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              :disabled="isLoading"
-              class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {{ isLoading ? 'Entrando...' : 'Entrar' }}
-            </button>
-          </div>
-
-          <div class="text-center">
-            <NuxtLink to="/" class="text-sm text-blue-600 hover:text-blue-700">
-              ← Voltar ao formulário
-            </NuxtLink>
-          </div>
-        </form>
-      </div>
-    </main>
+        <button 
+          type="submit" 
+          :disabled="isLoading"
+          class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
+        >
+          {{ isLoading ? 'Entrando...' : 'Entrar' }}
+        </button>
+      </form>
+    </div>
   </div>
 </template>
 
 <script setup>
-definePageMeta({
-  layout: false
-});
-
 const form = ref({
   username: '',
   password: ''
@@ -89,19 +52,27 @@ const handleLogin = async () => {
   isLoading.value = true;
 
   try {
-    const response = await $fetch('/api/auth/login', {
+    const response = await $fetch('http://127.0.0.1:3000/api/auth/login', {
       method: 'POST',
       body: form.value
     });
 
     if (response.success) {
-      await navigateTo('/admin');
+      const token = response.token;
+      
+      const expires = new Date();
+      expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000));
+      document.cookie = `auth-token=${token}; expires=${expires.toUTCString()}; path=/; SameSite=Lax`;
+      
+      localStorage.setItem('auth-token', token);
+      
+      window.location.href = '/admin';
     } else {
       error.value = response.error || 'Erro ao fazer login';
     }
   } catch (err) {
     console.error('Login error:', err);
-    error.value = err.data?.error || 'Erro ao fazer login';
+    error.value = 'Erro ao fazer login';
   } finally {
     isLoading.value = false;
   }

@@ -3,8 +3,11 @@ export default defineEventHandler(async (event) => {
     return { success: false, error: 'Método não permitido' };
   }
 
-  
-  deleteCookie(event, 'auth-token');
-
-  return { success: true, message: 'Logout realizado com sucesso' };
+  try {
+    deleteCookie(event, 'auth-token');
+    return { success: true, message: 'Logout realizado com sucesso' };
+  } catch (error: any) {
+    console.error('Logout error:', error);
+    return { success: false, error: 'Erro interno do servidor' };
+  }
 });

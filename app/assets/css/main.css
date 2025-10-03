@@ -1,11 +1,18 @@
-@tailwind base;
-@tailwind components;
+/* Main CSS */@tailwind base;
+
+@tailwind base;@tailwind components;
+
+@tailwind components;@tailwind utilities;
+
 @tailwind utilities;
 
 .form-container {
-  @apply max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg;
-}
 
+body {  @apply max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-lg;
+
+  font-family: 'Inter', sans-serif;}
+
+}
 .form-field {
   @apply mb-4;
 }

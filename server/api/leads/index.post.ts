@@ -1,60 +1,64 @@
+import { prisma } from '../../../lib/prisma';
+
 export default defineEventHandler(async (event) => {
-  const method = getMethod(event);
-
-  if (method === 'GET') {
-    try {
-      const query = getQuery(event);
-      const searchTerm = query.search as string;
-
-      if (searchTerm) {
-        
-        return { success: true, data: [] };
-      } else {
-        
-        return { success: true, data: [] };
-      }
-    } catch (error) {
-      return { success: false, error: 'Erro ao buscar leads' };
-    }
+  if (getMethod(event) !== 'POST') {
+    return { success: false, error: 'Método não permitido' };
   }
 
-  if (method === 'POST') {
-    try {
-      const body = await readBody(event);
-      
-      
-      if (!body.nome || !body.email || !body.telefone || !body.cargo || !body.dataNascimento || !body.mensagem) {
-        return { 
-          success: false, 
-          error: 'Campos obrigatórios não preenchidos' 
-        };
-      }
+  try {
+    const body = await readBody(event);
+    const { 
+      nome, 
+      email, 
+      telefone, 
+      cargo, 
+      dataNascimento, 
+      mensagem,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      utmTerm,
+      utmContent,
+      gclid,
+      fbclid,
+      ip
+    } = body;
 
-      
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(body.email)) {
-        return { 
-          success: false, 
-          error: 'Email inválido' 
-        };
-      }
-
-      
-      const newLead = {
-        id: `lead_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        ...body,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-
-      
-      
-      
-      return { success: true, data: newLead };
-    } catch (error: any) {
-      return { success: false, error: 'Erro ao criar lead' };
+    if (!nome || !email || !telefone || !cargo) {
+      setResponseStatus(event, 400);
+      return { success: false, error: 'Todos os campos obrigatórios devem ser preenchidos' };
     }
-  }
 
-  return { success: false, error: 'Método não permitido' };
+    const headers = getHeaders(event);
+    const query = getQuery(event);
+
+    const lead = await prisma.lead.create({
+      data: {
+        nome,
+        email,
+        telefone,
+        cargo,
+        dataNascimento: dataNascimento || '',
+        mensagem: mensagem || '',
+        utmSource: utmSource || query.utm_source as string || null,
+        utmMedium: utmMedium || query.utm_medium as string || null,
+        utmCampaign: utmCampaign || query.utm_campaign as string || null,
+        utmTerm: utmTerm || query.utm_term as string || null,
+        utmContent: utmContent || query.utm_content as string || null,
+        gclid: gclid || query.gclid as string || null,
+        fbclid: fbclid || query.fbclid as string || null,
+        ip: ip || headers['x-forwarded-for'] || headers['x-real-ip'] || null,
+        userAgent: headers['user-agent'] || null
+      }
+    });
+
+    return { 
+      success: true, 
+      message: 'Lead cadastrado com sucesso!',
+      data: { id: lead.id }
+    };
+  } catch (error: any) {
+    console.error('Create lead error:', error);
+    return { success: false, error: 'Erro interno do servidor' };
+  }
 });

@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { Database } from '../../utils/database';
+import { prisma } from '../../../lib/prisma';
 
 export default defineEventHandler(async (event) => {
   if (getMethod(event) !== 'POST') {
@@ -11,27 +11,20 @@ export default defineEventHandler(async (event) => {
     const body = await readBody(event);
     const { username, password } = body;
 
-    
     if (!username || !password) {
       setResponseStatus(event, 400);
       return { success: false, error: 'Usuário e senha são obrigatórios' };
     }
 
+    const user = await prisma.user.findUnique({
+      where: { username }
+    });
     
-    const user = await Database.getUserByUsername(username);
-    if (!user) {
+    if (!user || !await bcrypt.compare(password, user.passwordHash)) {
       setResponseStatus(event, 401);
       return { success: false, error: 'Credenciais inválidas' };
     }
 
-    
-    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
-    if (!isValidPassword) {
-      setResponseStatus(event, 401);
-      return { success: false, error: 'Credenciais inválidas' };
-    }
-
-    
     const config = useRuntimeConfig();
     const token = jwt.sign(
       { userId: user.id, username: user.username },
@@ -39,7 +32,6 @@ export default defineEventHandler(async (event) => {
       { expiresIn: '24h' }
     );
 
-    
     setCookie(event, 'auth-token', token, {
       httpOnly: true,
       secure: false, 
