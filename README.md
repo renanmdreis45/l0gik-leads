@@ -18,10 +18,6 @@ O sistema possui uma interface moderna e intuitiva com as seguintes telas princi
 - Campos opcionais: Empresa, Mensagem
 - Validação em tempo real dos dados
 
-<!-- Para adicionar screenshots, salve as imagens em ./assets/ e descomente as linhas abaixo:
-![Dashboard](./assets/admin-dashboard.png)
-![Novo Lead](./assets/novo-lead-form.png)
--->
 
 ## 🚀 Tecnologias Utilizadas
 
