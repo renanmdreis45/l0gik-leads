@@ -2,6 +2,16 @@
 
 Sistema completo de gerenciamento de leads com interface administrativa e formulário público de captura.
 
+## 📱 Screenshots
+
+### Dashboard Administrativo
+![Painel Administrativo](./assets/admin-dashboard.png)
+*Dashboard administrativo com estatísticas e gerenciamento completo de leads*
+
+### Formulário de Novo Lead
+![Novo Lead](./assets/novo-lead-form.png)
+*Interface para criação de novos leads com formulário completo*
+
 ## 🚀 Tecnologias Utilizadas
 
 ### Frontend
