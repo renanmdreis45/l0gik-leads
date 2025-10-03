@@ -2,15 +2,26 @@
 
 Sistema completo de gerenciamento de leads com interface administrativa e formulário público de captura.
 
-## 📱 Screenshots
+## 📱 Interface do Sistema
+
+O sistema possui uma interface moderna e intuitiva com as seguintes telas principais:
 
 ### Dashboard Administrativo
-![Painel Administrativo](./assets/admin-dashboard.png)
-*Dashboard administrativo com estatísticas e gerenciamento completo de leads*
+- Painel com estatísticas em tempo real (Total de leads, Hoje, Esta Semana, Este Mês)
+- Tabela completa de leads com busca e filtros
+- Funcionalidades de exportação (CSV/Excel)
+- Ações rápidas: visualizar, editar e excluir leads
 
 ### Formulário de Novo Lead
+- Interface limpa e organizada para criação de leads
+- Campos obrigatórios: Nome, Email, Telefone, Cargo
+- Campos opcionais: Empresa, Mensagem
+- Validação em tempo real dos dados
+
+<!-- Para adicionar screenshots, salve as imagens em ./assets/ e descomente as linhas abaixo:
+![Dashboard](./assets/admin-dashboard.png)
 ![Novo Lead](./assets/novo-lead-form.png)
-*Interface para criação de novos leads com formulário completo*
+-->
 
 ## 🚀 Tecnologias Utilizadas
 
